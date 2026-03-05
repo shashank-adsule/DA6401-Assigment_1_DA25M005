@@ -3,7 +3,7 @@ from .layers import Linear
 from .losses import get_loss
 
 
-class MLP:
+class NeuralNetwork:
     """
     Modular Multi-Layer Perceptron built using Linear layers.
     """
@@ -103,7 +103,7 @@ class MLP:
 
     @classmethod
     def from_config(cls, config_path):
-        """Instantiate an MLP from a best_config.json file."""
+        """Instantiate an NeuralNetwork from a best_config.json file."""
         import json
         with open(config_path) as f:
             cfg = json.load(f)
@@ -122,7 +122,7 @@ class MLP:
         for layer in self.layers:
             sizes.append(layer.n_out)
 
-        return f"MLP(layers={sizes})"
+        return f"NeuralNetwork(layers={sizes})"
 
 if __name__ == "__main__":
     np.random.seed(42)
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     y[np.arange(batch_size), random_classes] = 1
 
     # Create model
-    model = MLP(
+    model = NeuralNetwork(
         input_size=input_dim,
         hidden_sizes=[16, 8],
         output_size=num_classes,

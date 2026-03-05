@@ -4,7 +4,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from ann.neural_network import MLP
+from ann.neural_network import NeuralNetwork
 from ann.optimizers     import get_optimizer
 from utils.data        import prepare_data, get_batches
 from utils.metric      import precision_recall_f1, print_report
@@ -43,7 +43,7 @@ def parse_args():
                         help="W&B entity (username or team). Leave blank to use default.")
     parser.add_argument("--no_wandb",     action="store_true",
                         help="Disable W&B logging (useful for quick local tests)")
-    parser.add_argument("--save_dir",     default=[r"D:\code\repo\M.tech\sem2\DL\assignments\project1\assets","./models"][0])
+    parser.add_argument("--save_dir",     default=["./models"][0])
     parser.add_argument("--val_fraction", type=float, default=0.1)
 
     return parser.parse_args()
@@ -66,7 +66,7 @@ def train(config, data, use_wandb=False):
 
     Returns
     -------
-    trained MLP model
+    trained NeuralNetwork model
     """
 
     # Resolve hidden layer sizes
@@ -78,7 +78,7 @@ def train(config, data, use_wandb=False):
         hidden = hidden * config["num_layers"]
 
     # Build model
-    model = MLP(
+    model = NeuralNetwork(
         input_size   = 784,
         hidden_sizes = hidden,
         output_size  = 10,
@@ -92,8 +92,10 @@ def train(config, data, use_wandb=False):
 
     best_val_f1 = -1.0
     os.makedirs(config["save_dir"], exist_ok=True)
-    save_path   = os.path.join(config["save_dir"],"models", "best_model.npy")
-    config_path = os.path.join(config["save_dir"],"configs", "best_config.json")
+    save_path   = os.path.join(config["save_dir"],"best_model.npy")
+    config_path = os.path.join(config["save_dir"],"best_config.json")
+    # save_path   = os.path.join(config["save_dir"],"models", "best_model.npy")
+    # config_path = os.path.join(config["save_dir"],"configs", "best_config.json")
 
     for epoch in range(config["epochs"]):
 

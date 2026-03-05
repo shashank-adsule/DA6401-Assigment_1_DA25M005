@@ -6,7 +6,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from ann.neural_network import MLP
+from ann.neural_network import NeuralNetwork
 from utils.data        import prepare_data
 from utils.metric      import precision_recall_f1, confusion_matrix, print_report
 
@@ -17,7 +17,7 @@ from utils.metric      import precision_recall_f1, confusion_matrix, print_repor
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Run inference with a saved MLP model",
+        description="Run inference with a saved NeuralNetwork model",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
 
@@ -52,7 +52,7 @@ def main():
 
     # ── Load model from config + weights ─────────────────────────
     print(f"📦 Loading model from {args.config}...")
-    model = MLP.from_config(args.config)
+    model = NeuralNetwork.from_config(args.config)
     model.load(args.weights)
     print(model)
 
