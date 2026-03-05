@@ -137,19 +137,52 @@ class NeuralNetwork:
     def set_weights(self, weight_dict):
         """
         Loads weights from dict with keys W0, b0, W1, b1, ...
-        Matches professor's spec exactly.
+
+        IMPORTANT: also rebuilds self.layers to match the weight shapes exactly.
+        The autograder sets fixed weights whose dimensions may differ from the
+        config-based layer sizes built in __init__.
         """
         # Handle numpy 0-d wrapped object (from np.load)
         if isinstance(weight_dict, np.ndarray) and weight_dict.ndim == 0:
             weight_dict = weight_dict.item()
 
-        for i, layer in enumerate(self.layers):
-            w_key = f"W{i}"
-            b_key = f"b{i}"
-            if w_key in weight_dict:
-                layer.W = weight_dict[w_key].copy()
-            if b_key in weight_dict:
-                layer.b = weight_dict[b_key].copy()
+        # Count how many layers are in the weight dict
+        num_layers = sum(1 for k in weight_dict if k.startswith("W"))
+
+        # Rebuild layers to match weight shapes exactly
+        new_layers = []
+        for i in range(num_layers):
+            W = weight_dict[f"W{i}"]
+            b = weight_dict[f"b{i}"]
+            n_in, n_out = W.shape
+
+            # Reuse existing layer settings if available
+            if i < len(self.layers):
+                old_layer = self.layers[i]
+                if old_layer.is_output:
+                    activation = "linear"
+                elif old_layer.activation is not None:
+                    activation = old_layer.activation.__class__.__name__.lower()
+                else:
+                    activation = "relu"
+                weight_decay = old_layer.weight_decay
+            else:
+                activation   = "linear" if i == num_layers - 1 else "relu"
+                weight_decay = 0.0
+
+            # Always force output (last) layer to linear
+            if i == num_layers - 1:
+                activation = "linear"
+
+            layer = Linear(n_in, n_out,
+                           activation=activation,
+                           init="random",
+                           weight_decay=weight_decay)
+            layer.W = W.copy()
+            layer.b = b.copy()
+            new_layers.append(layer)
+
+        self.layers = new_layers
 
     def save(self, path):
         import os
