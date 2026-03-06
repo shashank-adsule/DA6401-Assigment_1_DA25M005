@@ -108,6 +108,25 @@ class NeuralNetwork:
     def compute_loss(self, y_true, y_pred):
         return self.loss_fn.forward(y_true, y_pred)
 
+    # def backward(self, y_true, y_pred):
+    #     delta = self.loss_fn.backward(y_true, y_pred)
+
+    #     grad_W_list = []
+    #     grad_b_list = []
+
+    #     for layer in reversed(self.layers):
+    #         delta = layer.backward(delta)
+    #         grad_W_list.append(layer.grad_W)
+    #         grad_b_list.append(layer.grad_b)
+
+    #     # Store as object arrays (index 0 = last layer)
+    #     self.grad_W = np.empty(len(grad_W_list), dtype=object)
+    #     self.grad_b = np.empty(len(grad_b_list), dtype=object)
+    #     for i, (gw, gb) in enumerate(zip(grad_W_list, grad_b_list)):
+    #         self.grad_W[i] = gw
+    #         self.grad_b[i] = gb
+
+    #     return self.grad_W, self.grad_b
     def backward(self, y_true, y_pred):
         delta = self.loss_fn.backward(y_true, y_pred)
 
@@ -119,9 +138,13 @@ class NeuralNetwork:
             grad_W_list.append(layer.grad_W)
             grad_b_list.append(layer.grad_b)
 
-        # Store as object arrays (index 0 = last layer)
+        # important fix
+        grad_W_list.reverse()
+        grad_b_list.reverse()
+
         self.grad_W = np.empty(len(grad_W_list), dtype=object)
         self.grad_b = np.empty(len(grad_b_list), dtype=object)
+
         for i, (gw, gb) in enumerate(zip(grad_W_list, grad_b_list)):
             self.grad_W[i] = gw
             self.grad_b[i] = gb
