@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument("-wd",   "--weight_decay",   type=float, default=0.0)
     parser.add_argument("-nhl",  "--num_layers",     type=int,   default=3)
     parser.add_argument("-sz",   "--hidden_size",    nargs="+",  type=int,
-                        default=[128, 128, 128])
+                        default=[128, 64, 32])
     parser.add_argument("-a",    "--activation",     default="relu",
                         choices=["relu", "sigmoid", "tanh"])
     parser.add_argument("-wi",   "--weight_init",    default="xavier",
