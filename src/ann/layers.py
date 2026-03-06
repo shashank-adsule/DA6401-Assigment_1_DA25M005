@@ -64,10 +64,10 @@ class Linear:
         if not self.is_output:
             delta = delta * self.activation.backward(self.z)
 
-        # Parameter gradients — summed over batch (NOT divided by m)
-        # Autograder expects sum convention: grad = a_prev.T @ delta
-        self.grad_W = self.a_prev.T @ delta
-        self.grad_b = np.sum(delta, axis=0, keepdims=True)
+        # Parameter gradients — averaged over batch (divided by m)
+        m = self.a_prev.shape[0]
+        self.grad_W = (self.a_prev.T @ delta) / m
+        self.grad_b = np.sum(delta, axis=0, keepdims=True) / m
 
         # L2 regularization (only for weights, not biases)
         if self.weight_decay > 0:
