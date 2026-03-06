@@ -38,10 +38,10 @@ class CrossEntropyLoss(Loss):
         return -np.sum(y_true * np.log(probs)) / m
 
     def backward(self, y_true, y_pred):
-        # Gradient of (softmax + CE) w.r.t. logits = probs - y_true
-        # NOT divided by m here — layers.py divides by batch size
+        # Gradient: (probs - y_true) / m  — /m lives here, NOT in layers
         probs = softmax(y_pred)
-        return probs - y_true
+        m = y_true.shape[0]
+        return (probs - y_true) / m
 
 
 class MSELoss(Loss):
@@ -61,8 +61,9 @@ class MSELoss(Loss):
 
     def backward(self, y_true, y_pred):
         probs = softmax(y_pred)
-        # dL/d(probs) — NOT divided by m; layers.py handles batch averaging
-        dL_dp = 2 * (probs - y_true)
+        m = y_true.shape[0]
+        # dL/d(probs) / m — /m lives here, NOT in layers
+        dL_dp = 2 * (probs - y_true) / m
         # Chain rule through softmax Jacobian
         dot = np.sum(dL_dp * probs, axis=1, keepdims=True)
         return probs * (dL_dp - dot)
