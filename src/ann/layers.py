@@ -58,24 +58,40 @@ class Linear:
             return self.z
         return self.activation.forward(self.z)
 
+    # def backward(self, delta):
+    #     # For hidden layers: multiply upstream delta by activation derivative
+    #     # For output (linear) layer: activation grad = 1, so delta passes through unchanged
+    #     if not self.is_output:
+    #         delta = delta * self.activation.backward(self.z)
+
+    #     # Parameter gradients — /m is handled by loss.backward, not here
+    #     self.grad_W = self.a_prev.T @ delta
+    #     self.grad_b = np.sum(delta, axis=0, keepdims=True)
+
+    #     # L2 regularization (only for weights, not biases)
+    #     if self.weight_decay > 0:
+    #         self.grad_W += self.weight_decay * self.W
+
+    #     # Gradient to propagate to the previous layer
+    #     delta_prev = delta @ self.W.T
+    #     return delta_prev
     def backward(self, delta):
-        # For hidden layers: multiply upstream delta by activation derivative
-        # For output (linear) layer: activation grad = 1, so delta passes through unchanged
+
         if not self.is_output:
             delta = delta * self.activation.backward(self.z)
 
-        # Parameter gradients — /m is handled by loss.backward, not here
         self.grad_W = self.a_prev.T @ delta
         self.grad_b = np.sum(delta, axis=0, keepdims=True)
 
-        # L2 regularization (only for weights, not biases)
+        # Correct L2 regularization
         if self.weight_decay > 0:
-            self.grad_W += self.weight_decay * self.W
+            m = self.a_prev.shape[0]
+            self.grad_W += (self.weight_decay / m) * self.W
 
-        # Gradient to propagate to the previous layer
         delta_prev = delta @ self.W.T
-        return delta_prev
 
+        return delta_prev
+    
     def get_params(self):
         return self.W, self.b
 
