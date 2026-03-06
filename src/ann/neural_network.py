@@ -30,16 +30,25 @@ class NeuralNetwork:
         import argparse
         if isinstance(input_size, argparse.Namespace):
             args = input_size
-            # Unpack all fields from the Namespace
             hidden_size  = getattr(args, "hidden_size",  128)
             num_layers   = getattr(args, "num_layers",   3)
-            hidden_sizes = [hidden_size] * num_layers
             output_size  = getattr(args, "output_size",  10)
             input_size   = getattr(args, "input_size",   784)
             activation   = getattr(args, "activation",   "relu")
             loss         = getattr(args, "loss",         "cross_entropy")
             weight_init  = getattr(args, "weight_init",  "xavier")
             weight_decay = getattr(args, "weight_decay", 0.0)
+
+            # hidden_size from argparse can be int OR list — handle both
+            if isinstance(hidden_size, list):
+                # Already a list — use directly, ignore num_layers
+                hidden_sizes = [int(h) for h in hidden_size]
+                # If only one value given, expand by num_layers
+                if len(hidden_sizes) == 1:
+                    hidden_sizes = hidden_sizes * num_layers
+            else:
+                # Single int — expand by num_layers
+                hidden_sizes = [int(hidden_size)] * num_layers
 
         # ── Handle hidden_size (int) + num_layers instead of hidden_sizes (list) ──
         if hidden_sizes is None:
